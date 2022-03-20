@@ -17,6 +17,15 @@ function addToTable(rowOutput, name, score, gameNum) {
     });
 }
 
+function checkIfUserAlreadyScoredToday(name, gameNum) {
+    for (let i = 0; i < table.length; i++) {
+        if (table[i].name === name && table[i].gameNum === gameNum) {
+            return true;
+        }
+    }
+    return false;
+}
+
 app.post("/api/addScore", (req, res) => {
     gameOutput = req.body.output;
     nameOutput = req.body.name;
@@ -41,7 +50,12 @@ app.post("/api/addScore", (req, res) => {
     let gameNum = processedOutput[1];
     let numLinesUsed = processedOutput[2][0];
 
-    addToTable(processedOutput.slice(3), nameOutput, numLinesUsed, gameNum);
+    if (checkIfUserAlreadyScoredToday(nameOutput, gameNum)) {
+        res.status(400).send("User already scored today");
+        return;
+    } else {
+        addToTable(processedOutput.slice(3), nameOutput, numLinesUsed, gameNum);
+    }
 
     res.send(table);
 });
