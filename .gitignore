@@ -131,3 +131,4 @@ dist
 
 # Build File for React App (will be built by heroku anyways)
 server/public
+public
