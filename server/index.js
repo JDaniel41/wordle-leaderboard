@@ -2,7 +2,12 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 
+const cors = require("cors");
+
 app.use(bodyParser.json());
+app.use(cors());
+
+app.use(express.static(__dirname + "/public"));
 
 let table = [];
 
@@ -29,15 +34,17 @@ function checkIfUserAlreadyScoredToday(name, gameNum) {
 app.post("/api/addScore", (req, res) => {
     gameOutput = req.body.output;
     nameOutput = req.body.name;
-    pinNum = req.body.pinNum;
+    pinNum = req.body.pin;
+
+    console.log(req.body);
 
     if (!gameOutput || !nameOutput || !pinNum) {
-        res.status(400).send("Bad Request");
+        res.status(400).send({ message: "Bad Request" });
         return;
     }
 
     if (pinNum != "1234") {
-        res.status(401).send("Unauthorized");
+        res.status(401).send({ message: "Unauthorized" });
         return;
     }
     // Read the first number in the body
@@ -51,7 +58,7 @@ app.post("/api/addScore", (req, res) => {
     let numLinesUsed = processedOutput[2][0];
 
     if (checkIfUserAlreadyScoredToday(nameOutput, gameNum)) {
-        res.status(400).send("User already scored today");
+        res.status(400).send({ message: "User already scored today" });
         return;
     } else {
         addToTable(processedOutput.slice(3), nameOutput, numLinesUsed, gameNum);
@@ -83,6 +90,6 @@ const client = new DynamoDBClient({
     }
 })();*/
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log("Server started on port 3000");
+app.listen(process.env.PORT || 3001, () => {
+    console.log("Server started on port 3001");
 });
